@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Измени локацију</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #1f3663; color: white; padding: 20px; font-family: 'Segoe UI', sans-serif; }
+        .container { background: white; color: black; padding: 30px; border-radius: 10px; }
+        .error { color: red; font-size: 14px; }
+        .success { color: green; font-size: 14px; }
+        .form-group { margin-bottom: 15px; }
+        .invalid { border: 2px solid #ff4500; }
+        .valid { border: 2px solid #90ee90; }
+        #workingHoursContainer .row { margin-bottom: 10px; }
+        #statusMessage { margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Измени локацију</h2>
+        <div id="serverError" class="error text-center"></div>
+        <form id="locationForm">
+            <input type="hidden" id="locationId">
+            <div class="form-group">
+                <label for="locationName" class="form-label">Назив локације *</label>
+                <input type="text" class="form-control" id="locationName" required>
+                <div id="nameError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="locationAddress" class="form-label">Адреса *</label>
+                <input type="text" class="form-control" id="locationAddress" required>
+                <div id="addressError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="locationCity" class="form-label">Град *</label>
+                <input type="text" class="form-control" id="locationCity" required>
+                <div id="cityError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="locationDescription" class="form-label">Опис</label>
+                <textarea class="form-control" id="locationDescription" rows="3"></textarea>
+                <div id="descriptionError" class="error"></div>
+            </div>
+            <div class="form-group" id="workingHoursContainer">
+                <label class="form-label">Радно време *</label>
+                <div id="workingHoursList"></div>
+                <button type="button" class="btn btn-secondary mt-2" id="addWorkingHour">Додај радно време</button>
+                <div id="workingHoursError" class="error"></div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3" id="saveLocation">Snimi</button>
+            <div id="statusMessage"></div>
+        </form>
+        <button class="btn btn-secondary mt-3" id="backButton">Назад</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/locationscripts.js"></script>
+</body>
+</html>

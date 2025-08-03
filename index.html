@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>MEF Events</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {margin: 0; background: linear-gradient(to right, #1a254b, #1f3663, #1a254b);
+        font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            background-color: #1f3663;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            color: white;
+            z-index: 999;
+        }
+        .navbar h1 { margin: 0; font-size: 20px;letter-spacing: 1px;}
+        .navbar .right-icons {font-size: 20px;}
+        .navbar .right-icons a {color: white; text-decoration: none; margin-left: 20px; }
+        .hero {
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 1px 1px 3px black;
+            text-align: center;
+        }
+        .hero h2 { font-size: 36px; margin: 0;}
+
+        @media (max-width: 600px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .right-icons {
+                margin-top: 10px;
+            }
+
+            .hero h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>MEF Events</h1>
+        <div class="right-icons">
+            <a href="prijava.html" title="Пријава">
+                <i class="fas fa-user"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="hero">
+        <h2>Добродошли на портал за резервацију улазница</h2>
+    </div>
+
+</body>
+</html>

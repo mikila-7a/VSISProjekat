@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Registracija korisnika</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1f3663;; padding: 20px; }
+        form { background: white; padding: 40px; max-width: 400px; margin: auto; border-radius: 10px; }
+        input, select { width: 100%; padding-top: 10px; padding-bottom: 10px;  margin-bottom: 10px; }
+        .error { color: orange; font-size: 14px;}
+        .server-error { color: red; text-align: center; font-weight: bold; margin-top: 10px; }
+        .success { color: green; font-size: 14px; }
+        .invalid { border: 2px solid orange; }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align:center;color:white;">Регистрација</h2>
+
+<form id="formaRegistracija">
+    <input type="text" id="imePrezime" placeholder="Име и презиме" required>
+    <div id="greskaImePrezime" class="error"></div>
+
+    <input type="email" id="email" placeholder="Е-мејл" required>
+    <div id="greskaEmail" class="error"></div>
+
+    <input type="password" id="lozinka" placeholder="Лозинка" required>
+    <div id="greskaLozinka" class="error"></div>
+
+    <input type="password" id="ponovljenaLozinka" placeholder="Поновите лозинку" required>
+    <div id="greskaPonovljena" class="error"></div>
+
+    <input type="text" id="telefon" placeholder="Телефон (није обавезно)">
+    <div id="greskaTelefon" class="error"></div>
+
+    <select id="uloga">
+        <option value="">Обичан корисник</option>
+        <option value="administrator">Администратор</option>
+    </select>
+
+    <button type="submit">Региструј се</button>
+    <div id="serverError" class="server-error"></div>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+const API_TOKEN = "q0GSu3yJd74HpF6wV6tnhuWDffGjlciIE5tIrpx3SnoOXCabD2FUsLZIqCahtjWjy0PL4KSd8wxAbHKYyFPpZ8CsYD";
+
+function validirajImePrezime(ime) {
+    const regex = /^([A-ZČĆŽŠĐ][a-zčćžšđ]+(?:[- ][A-ZČĆŽŠĐ][a-zčćžšđ]+)*)$/u;
+    return regex.test(ime) && ime.length >= 5 && ime.length <= 180;
+}
+
+function validirajTelefon(telefon) {
+    const regex = /^\+[1-9][0-9]{8,13}$/;
+    return regex.test(telefon);
+}
+
+function validirajLozinku(lozinka) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
+    return regex.test(lozinka);
+}
+
+$(document).ready(function () {
+
+    $("#telefon").on("blur", function () {
+        const tel = $(this).val().trim();
+        if (tel && !validirajTelefon(tel)) {
+            $(this).addClass("invalid");
+            $("#greskaTelefon").text("Телефон није исправан.");
+        } else {
+            $(this).removeClass("invalid");
+            $("#greskaTelefon").text("");
+        }
+    });
+
+    $("#lozinka").on("blur", function () {
+        const lozinka = $(this).val().trim();
+        if (!validirajLozinku(lozinka)) {
+            $(this).addClass("invalid");
+            $("#greskaLozinka").text("Лозинка није довољно јака.");
+        } else {
+            $(this).removeClass("invalid");
+            $("#greskaLozinka").text("");
+        }
+    });
+
+    $("#ponovljenaLozinka").on("blur", function () {
+        const lozinka = $("#lozinka").val().trim();
+        const pon = $(this).val().trim();
+        if (lozinka !== pon) {
+            $(this).addClass("invalid");
+            $("#greskaPonovljena").text("Лозинке се не поклапају.");
+        } else {
+            $(this).removeClass("invalid");
+            $("#greskaPonovljena").text("");
+        }
+    });
+
+    $("#email").on("blur", function () {
+        if (!$(this).val().trim()) {
+            $(this).addClass("invalid");
+            $("#greskaEmail").text("Нисте унели имејл.");
+        } else {
+            $(this).removeClass("invalid");
+            $("#greskaEmail").text("");
+        }
+    });
+
+    $("#imePrezime").on("blur", function () {
+        if (!validirajImePrezime($(this).val().trim())) {
+            $(this).addClass("invalid");
+            $("#greskaImePrezime").text("Име и презиме није исправно написано.");
+        } else {
+            $(this).removeClass("invalid");
+            $("#greskaImePrezime").text("");
+        }
+    });
+
+    $("#formaRegistracija").submit(function (e) {
+        e.preventDefault();
+
+        let valid = true;
+        $("#serverError").text("");
+
+        const imePrezime = $("#imePrezime").val().trim();
+        const email = $("#email").val().trim();
+        const lozinka = $("#lozinka").val().trim();
+        const ponLozinka = $("#ponovljenaLozinka").val().trim();
+        const telefon = $("#telefon").val().trim();
+        const uloga = $("#uloga").val();
+
+        if (!validirajImePrezime(imePrezime)) valid = false;
+        if (!email) {
+            $("#greskaEmail").text("Нисте унели имејл.");
+            $("#email").addClass("invalid");
+            valid = false;
+        }
+        if (!validirajLozinku(lozinka)) valid = false;
+        if (lozinka !== ponLozinka) valid = false;
+        if (telefon && !validirajTelefon(telefon)) valid = false;
+
+        if (!valid) return;
+
+        $.ajax({
+            url: "https://vsis.mef.edu.rs/projekat/ulaznice/public_html/api/register",
+            type: "POST",
+            headers: {
+                "Accept": "application/json"
+            },
+            data: {
+                name: imePrezime,
+                email: email,
+                phone: telefon,
+                password: lozinka,
+                role: uloga,
+                apitoken: API_TOKEN
+             },
+            success: function (res) {
+                window.location.href = "prijava.html"; 
+            },
+            error: function (xhr) {
+                try {
+                    const err = JSON.parse(xhr.responseText);
+                    if (err.error) {
+                        $("#serverError").text(err.error);
+                        $("#email").val("").addClass("invalid");
+                    } else {
+                        $("#serverError").text("Грешка при регистрацији.");
+                    }
+                } catch {
+                    $("#serverError").text("Непозната грешка при регистрацији.");
+                }
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>

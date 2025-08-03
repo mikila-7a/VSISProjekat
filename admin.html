@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ панел</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #1f3663; color: white; padding: 20px; font-family: 'Segoe UI', sans-serif; }
+        .container { background: white; color: black; padding: 30px; border-radius: 10px; }
+        .error { color: red; font-size: 14px; }
+        .success { color: green; font-size: 14px; }
+        table { margin-top: 20px; }
+        .modal-content { color: black; }
+        .invalid { border: 2px solid #ff4500; }
+        .valid { border: 2px solid #90ee90; }
+        .form-group { margin-bottom: 15px; }
+        .bold-row { border: 3px solid black;}
+        #locationSelectContainer { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container" id="adminContainer">
+        <h2 class="text-center">Админ панел</h2>
+        <button class="btn btn-secondary mb-3" id="logoutButton">Одјави се</button>
+        <div id="serverError" class="error text-center"></div>
+        <!-- Uloge -->
+        <h3>Улоге корисника</h3>
+        <table class="table table-bordered" id="rolesTable">
+            <thead><tr><th>ID</th><th>Улога</th><th>Опис</th><th>Број корисника</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <!-- Korisnici -->
+        <h3>Корисници</h3>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#userModal">Додај корисника</button>
+        <h4>Администратори</h4>
+        <table class="table table-bordered" id="adminsTable">
+            <thead><tr><th>ID</th><th>Име и презиме</th><th>Е-мејл</th><th>Телефон</th><th>Акције</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <h4>Благајници</h4>
+        <table class="table table-bordered" id="cashiersTable">
+            <thead><tr><th>ID</th><th>Име и презиме</th><th>Е-мејл</th><th>Телефон</th><th>Локација</th><th>Акције</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <h4>Регистровани корисници</h4>
+        <table class="table table-bordered" id="usersTable">
+            <thead><tr><th>ID</th><th>Име и презиме</th><th>Е-мејл</th><th>Телефон</th><th>Акције</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <h4>Блокирани корисници</h4>
+        <table class="table table-bordered" id="blockedUsersTable">
+            <thead><tr><th>ID</th>
+                <th>Име и презиме</th>
+                <th>Е-мејл</th>
+                <th>Телефон</th>
+                <th>Акције</th>
+            </tr></thead>
+            <tbody></tbody>
+        </table>
+        <!-- Lokacije -->
+        <h3>Локације</h3>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#locationModal">Додај локацију</button>
+        <table class="table table-bordered" id="locationsTable">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Назив локације</th>
+                    <th>Град</th>
+                    <th>Адреса</th>
+                    <th>Опис</th>
+                    <th>Радно време</th>
+                    <th>Укупно благајника</th>
+                    <th>Укупно догађаја</th>
+                    <th>Акција</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    <!-- Modal za korisnike -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Додај/Измени корисника</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <input type="hidden" id="userId">
+                        <div class="form-group">
+                            <label for="userName" class="form-label">Име и презиме *</label>
+                            <input type="text" class="form-control" id="userName" required>
+                            <div id="nameError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail" class="form-label">Е-мејл *</label>
+                            <input type="email" class="form-control" id="userEmail" required>
+                            <div id="emailError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPhone" class="form-label">Телефон</label>
+                            <input type="text" class="form-control" id="userPhone">
+                            <div id="phoneError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPassword" class="form-label">Лозинка *</label>
+                            <input type="password" class="form-control" id="userPassword" required>
+                            <div id="passwordError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userPasswordConfirm" class="form-label">Поновљена лозинка *</label>
+                            <input type="password" class="form-control" id="userPasswordConfirm" required>
+                            <div id="passwordConfirmError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="userRole" class="form-label">Улога *</label>
+                            <select class="form-control" id="userRole" required></select>
+                        </div>
+                        <div class="form-group" id="locationSelectContainer">
+                            <label for="userLocation" class="form-label">Локација *</label>
+                            <select class="form-control" id="userLocation" required></select>
+                            <div id="locationError" class="error"></div>
+                        </div>
+                        <div id="userFormError" class="error"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+                    <button type="button" class="btn btn-primary" id="saveUser">Сачувај</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal za lokacije -->
+    <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locationModalLabel">Додај локацију</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+            </div>
+            <div class="modal-body">
+                <form id="locationForm">
+                <div class="mb-3">
+                    <label for="locationName" class="form-label">Назив*</label>
+                    <input type="text" class="form-control" id="locationName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="locationAddress" class="form-label">Адреса*</label>
+                    <input type="text" class="form-control" id="locationAddress" required>
+                </div>
+                <div class="mb-3">
+                    <label for="locationCity" class="form-label">Град*</label>
+                    <input type="text" class="form-control" id="locationCity" required>
+                </div>
+                <div class="mb-3">
+                    <label for="locationDescription" class="form-label">Опис</label>
+                    <textarea class="form-control" id="locationDescription" rows="3"></textarea>
+                </div>
+
+                <h6 class="mt-4">Радно време</h6>
+                <div id="workHoursContainer"></div>
+
+                <div id="locationFormError" class="text-danger mt-2"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Откажи</button>
+                <button type="button" class="btn btn-primary" id="saveLocation">Сачувај</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/adminscripts.js"></script>
+</body>
+</html>

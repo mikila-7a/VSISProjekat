@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Пријава</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1f3663; padding: 20px; }
+        form { background: white; padding: 40px; max-width: 400px; margin: auto; border-radius: 10px; }
+        input { width: 100%; padding-top: 10px; padding-bottom: 10px;  margin-bottom: 10px; }
+        button { width: 100%; padding: 10px; }
+        .error { color: red; font-size: 14px; margin-top: 10px; text-align: center; }
+        .invalid { border: 2px solid red; }
+        .register-link {  margin-top: 15px; font-size: 14px; text-align: center;}
+        .register-link a { color: #007BFF;text-decoration: none;}
+        .register-link a:hover {text-decoration: underline;}
+    </style>
+</head>
+<body>
+
+<h2 style="text-align:center; color:white;">Пријава</h2>
+
+<form id="formaPrijava">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="lozinka" placeholder="Лозинка" required>
+    <button type="submit">Пријави се</button>
+    <div id="greska" class="error"></div>
+    <p class="register-link">
+        Немате налог?
+        <a href="registracija.html">Региструјте се кликом овде</a>.
+    </p>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const API_TOKEN = "q0GSu3yJd74HpF6wV6tnhuWDffGjlciIE5tIrpx3SnoOXCabD2FUsLZIqCahtjWjy0PL4KSd8wxAbHKYyFPpZ8CsYD";
+    $(document).ready(function () {
+        $("#formaPrijava").submit(function (e) {
+            e.preventDefault();
+
+            const email = $("#email").val().trim();
+            const lozinka = $("#lozinka").val().trim();
+
+            $("#greska").text("");
+            $("#lozinka").removeClass("invalid");
+
+            $.ajax({
+                url: "https://vsis.mef.edu.rs/projekat/ulaznice/public_html/api/login",
+                type: "POST",
+                headers: {
+                "Accept": "application/json"
+                },
+                data: {
+                    email: email,
+                    password: lozinka,
+                    apitoken: API_TOKEN
+                },
+                success: function (res) {
+                    if (res.token && res.type) {
+                        localStorage.setItem("token", res.token);
+                        localStorage.setItem("type", res.type);
+
+                        switch (res.type) {
+                            case "администратор":
+                                window.location.href = "admin.html";
+                                break;
+                            case "благајник":
+                                window.location.href = "blagajnik.html";
+                                break;
+                            case "регистровани корисник":
+                                window.location.href = "korisnik.html";
+                                break;
+                            case "блокирани корисник":
+                                alert("Ваш налог је блокиран. Обратите се подршци.");
+                                break;
+                            default:
+                                $("#greska").text("Непознат тип корисника.");
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.error) {
+                            $("#greska").text(res.error);
+                            $("#lozinka").val("").addClass("invalid");
+                        } else {
+                            $("#greska").text("Дошло је до грешке при пријави.");
+                        }
+                    } catch {
+                        $("#greska").text("Непозната грешка.");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
